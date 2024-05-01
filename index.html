@@ -1,0 +1,379 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+		<title>Space Invaders</title>
+		<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+		<meta name=apple-mobile-web-app-capable content=yes />
+		<meta name=apple-mobile-web-app-status-bar-style content=black>
+		<meta name="viewport" content="width=device-width, user-scalable=no" />
+		<link href="https://fonts.googleapis.com/css?family=Press+Start+2P" rel="stylesheet">
+		<style type="text/css">
+
+			* {margin: 0; padding: 0;}
+
+			html, body {width: 100%; height: 100%; text-align: center; overflow: hidden; touch-action: none;}
+			canvas {display: block; width: 100%; height: 100%; background: #000; overflow: hidden;}
+			#game {width: 800px; height: 550px; overflow: hidden; position: relative;
+			-webkit-touch-callout: none;
+		    -webkit-user-select: none; 
+			}
+
+			#button_left
+			{
+			position:absolute;
+			top:460px;
+			left:0px;
+			z-index:200;
+			box-sizing: border-box;
+ 			width: 84px;
+ 			height: 84px;
+ 			//padding:5px;
+			border-style: solid;
+ 			border-width: 42px 84px 42px 0px;
+    		border-color: transparent rgba(255,255,255,0.5) transparent transparent;
+ 			cursor:pointer;
+ 			-webkit-touch-callout: none;
+		    -webkit-user-select: none; 
+			}
+
+			#button_right
+			{
+			position:absolute;
+			top:460px;
+			left:140px;
+			box-sizing: border-box;
+ 			width: 84px;
+ 			height: 84px;
+ 			//padding:5px;
+			border-style: solid;
+ 			border-width: 42px 0px 42px 84px;
+ 			border-color: transparent transparent transparent rgba(255,255,255,0.5);
+ 			cursor:pointer;
+ 			-webkit-touch-callout: none;
+		    -webkit-user-select: none; 
+			}
+
+			#button_fire
+			{
+			position:absolute;
+			top:460px;
+			right:8px;
+			width:84px;
+			height:58px;
+			padding-top:26px;
+			font-size:18px;
+			font-family:'Press Start 2P';
+			text-align:center;
+			border:1px solid #fff;
+			border-radius:74px;
+			background:rgba(255,255,255,0.5);
+ 			-webkit-touch-callout: none;
+		    -webkit-user-select: none; 
+			}
+
+			ol li {list-style-position: inside; line-height: 1.5em;}					
+			p {font-family: 'Press Start 2P', cursive;}
+			p.text {display: block; color: #fff; font-family: 'Press Start 2P', cursive; font-weight: normal; font-size: 1.3em; text-transform: uppercase; padding: 0; margin: 0;}
+			p.menuText {line-height: 2em;}
+			p.instructionsText {padding-bottom: 0.5em;}
+			p.scoreText {padding-bottom: 1em;} 
+			p.scoreAdvanceText {line-height: 1.5em;} 
+			p.creditText, p.livesText {padding: 0 1em 0.5em 0;}
+			p.menuHeaderText {font-weight: bold; font-size: 2em; line-height: 3em;}
+			p.smallText {font-size: 0.8em; line-height: 2em;}
+			p#insertCoins {line-height: 2em;margin-top: 2em;}
+			p#copyright {padding-bottom: 0.5em;}
+			p#copyright a {text-decoration: none; color: #fff;}
+			div.field {display: block; position: absolute; text-align: center;}
+			div.livesField {padding-left: 1em;}
+			div.scoreField {padding: 1em;}
+			div.menuFieldFrame {padding: 3em; border: 3px solid #0f0; background: #000;}
+			div.instructionsFieldFrame {padding: 3em; border: 3px solid #0f0; background: #000; text-align: left;}
+			.clickText {cursor: pointer;}
+			p#copyright a:hover, .clickText:hover {color: #0f0;}
+
+			/*===================================
+				"play" and alien intro animations
+			===================================*/ 
+			p#play {
+				display: block;
+				overflow: hidden;
+			}			
+			#span_container {
+				display: inline-block;
+				position: relative;	
+				line-height: 50px;
+				transition: left 4s linear 2s;	
+				-webkit-transition: left 4s linear 2s;	
+				-moz-transition: left 4s linear 2s;	
+			}			
+			#span_y {
+				display: inline-block;
+				position: relative;
+				top: -5px;
+				transform: rotate(180deg);
+				-webkit-transform: rotate(180deg);
+				-moz-transform: rotate(180deg);
+			}
+			#span_y.end {
+				top: 0px;
+				transform: rotate(0deg);
+				-webkit-transform: rotate(0deg);
+				-moz-transform: rotate(0deg);
+			}			
+			#span_img {
+				display: inline-block;
+				width: 32px;
+				height: 32px;
+				position: absolute;
+				margin-left: 25px;
+				background-position: -4px 0px;
+				background-repeat: no-repeat;
+			}
+			#span_img.slide {
+				-webkit-transition: left 4s linear 1s;				
+				-webkit-animation: animate 8s infinite;
+				-moz-transition: left 4s linear 1s;				
+				-moz-animation: animate 8s infinite;
+				transition: left 4s linear 1s;				
+				animation: animate 8s infinite;
+			}
+			#span_img.end {
+				transition: opacity 1s linear 1s;	
+				-webkit-transition: opacity 1s linear 1s;
+				-moz-transition: opacity 1s linear 1s;				
+			}
+			@-webkit-keyframes animate {
+				0%  	{background-position: -4px 0px;}
+				1.99%  	{background-position: -4px 0px;}
+				2% 		{background-position: -40px 0px;}
+				3.99% 	{background-position: -40px 0px;}
+				4% 		{background-position: -4px 0px;}
+				5.99% 	{background-position: -4px 0px;}
+				6% 		{background-position: -40px 0px;}
+				7.99% 	{background-position: -40px 0px;}	
+				8% 		{background-position: -4px 0px;}
+				9.99% 	{background-position: -4px 0px;}
+				10% 	{background-position: -40px 0px;}
+				11.99% 	{background-position: -40px 0px;}
+				12% 	{background-position: -4px 0px;}
+				13.99% 	{background-position: -4px 0px;}
+				14% 	{background-position: -40px 0px;}
+				15.99% 	{background-position: -40px 0px;}	
+				16% 	{background-position: -4px 0px;}
+				17.99% 	{background-position: -4px 0px;}
+				18% 	{background-position: -40px 0px;}
+				19.99% 	{background-position: -40px 0px;}				
+				20% 	{background-position: -4px 0px;}
+				21.99% 	{background-position: -4px 0px;}
+				22% 	{background-position: -40px 0px;}
+				23.99% 	{background-position: -40px 0px;}
+				24% 	{background-position: -4px 0px;}
+				25.99% 	{background-position: -4px 0px;}
+				26% 	{background-position: -40px 0px;}
+				27.99% 	{background-position: -40px 0px;}
+				28% 	{background-position: -4px 0px;}
+				29.99% 	{background-position: -4px 0px;}
+				30% 	{background-position: -40px 0px;}
+				31.99% 	{background-position: -40px 0px;}
+				32% 	{background-position: -4px 0px;}
+				33.99% 	{background-position: -4px 0px;}
+				34% 	{background-position: -40px 0px;}
+				35.99% 	{background-position: -40px 0px;}
+				36% 	{background-position: -4px 0px;}
+				37.99% 	{background-position: -4px 0px;}
+				38% 	{background-position: -40px 0px;}
+				39.99% 	{background-position: -40px 0px;}
+				40% 	{background-position: -4px 0px;}
+				41.99% 	{background-position: -4px 0px;}				
+				42% 	{background-position: -40px 0px;}
+				43.99% 	{background-position: -40px 0px;}	
+				44% 	{background-position: -4px 0px;}
+				45.99% 	{background-position: -4px 0px;}	
+				46% 	{background-position: -40px 0px;}
+				47.99% 	{background-position: -40px 0px;}	
+				48% 	{background-position: -4px 0px;}
+				49.99% 	{background-position: -4px 0px;}	
+				50% 	{background-position: -40px 0px;}
+				51.99% 	{background-position: -40px 0px;}	
+				52% 	{background-position: -4px 0px;}
+				53.99% 	{background-position: -4px 0px;}
+				54% 	{background-position: -40px 0px;}
+				55.99% 	{background-position: -40px 0px;}	
+				56% 	{background-position: -4px 0px;}
+				57.99% 	{background-position: -4px 0px;}	
+				58% 	{background-position: -40px 0px;}
+				59.99% 	{background-position: -40px 0px;}	
+				60% 	{background-position: -4px 0px;}
+				61.99% 	{background-position: -4px 0px;}	
+				62% 	{background-position: -40px 0px;}
+				63.99% 	{background-position: -40px 0px;}	
+				64% 	{background-position: -4px 0px;}
+				65.99% 	{background-position: -4px 0px;}
+				66% 	{background-position: -40px 0px;}
+				67.99% 	{background-position: -40px 0px;}
+				68% 	{background-position: -4px 0px;}
+				69.99% 	{background-position: -4px 0px;}
+				70% 	{background-position: -40px 0px;}
+				71.99% 	{background-position: -40px 0px;}
+				72% 	{background-position: -4px 0px;}
+				73.99% 	{background-position: -4px 0px;}
+				74% 	{background-position: -40px 0px;}
+				75.99% 	{background-position: -40px 0px;}
+				76% 	{background-position: -4px 0px;}				
+				77.99% 	{background-position: -4px 0px;}
+				78%  	{background-position: -40px 0px;}
+				79.99%  {background-position: -40px 0px;}
+				80% 	{background-position: -4px 0px;}
+				81.99% 	{background-position: -4px 0px;}
+				82% 	{background-position: -40px 0px;}
+				83.99% 	{background-position: -40px 0px;}
+				84% 	{background-position: -4px 0px;}
+				85.99% 	{background-position: -4px 0px;}	
+				86% 	{background-position: -40px 0px;}
+				87.99% 	{background-position: -40px 0px;}
+				88% 	{background-position: -4px 0px;}
+				89.99% 	{background-position: -4px 0px;}
+				90% 	{background-position: -40px 0px;}
+				91.99% 	{background-position: -40px 0px;}
+				92% 	{background-position: -4px 0px;}
+				93.99% 	{background-position: -4px 0px;}	
+				94% 	{background-position: -40px 0px;}
+				95.99% 	{background-position: -40px 0px;}
+				96% 	{background-position: -4px 0px;}
+				97.99% 	{background-position: -4px 0px;}
+				98% 	{background-position: -40px 0px;}
+				99.99% 	{background-position: -40px 0px;}
+				100% 	{background-position: -40px 0px;}					
+			}	
+			@-moz-keyframes animate {
+				0%  	{background-position: -4px 0px;}
+				1.99%  	{background-position: -4px 0px;}
+				2% 		{background-position: -40px 0px;}
+				3.99% 	{background-position: -40px 0px;}
+				4% 		{background-position: -4px 0px;}
+				5.99% 	{background-position: -4px 0px;}
+				6% 		{background-position: -40px 0px;}
+				7.99% 	{background-position: -40px 0px;}	
+				8% 		{background-position: -4px 0px;}
+				9.99% 	{background-position: -4px 0px;}
+				10% 	{background-position: -40px 0px;}
+				11.99% 	{background-position: -40px 0px;}
+				12% 	{background-position: -4px 0px;}
+				13.99% 	{background-position: -4px 0px;}
+				14% 	{background-position: -40px 0px;}
+				15.99% 	{background-position: -40px 0px;}	
+				16% 	{background-position: -4px 0px;}
+				17.99% 	{background-position: -4px 0px;}
+				18% 	{background-position: -40px 0px;}
+				19.99% 	{background-position: -40px 0px;}				
+				20% 	{background-position: -4px 0px;}
+				21.99% 	{background-position: -4px 0px;}
+				22% 	{background-position: -40px 0px;}
+				23.99% 	{background-position: -40px 0px;}
+				24% 	{background-position: -4px 0px;}
+				25.99% 	{background-position: -4px 0px;}
+				26% 	{background-position: -40px 0px;}
+				27.99% 	{background-position: -40px 0px;}
+				28% 	{background-position: -4px 0px;}
+				29.99% 	{background-position: -4px 0px;}
+				30% 	{background-position: -40px 0px;}
+				31.99% 	{background-position: -40px 0px;}
+				32% 	{background-position: -4px 0px;}
+				33.99% 	{background-position: -4px 0px;}
+				34% 	{background-position: -40px 0px;}
+				35.99% 	{background-position: -40px 0px;}
+				36% 	{background-position: -4px 0px;}
+				37.99% 	{background-position: -4px 0px;}
+				38% 	{background-position: -40px 0px;}
+				39.99% 	{background-position: -40px 0px;}
+				40% 	{background-position: -4px 0px;}
+				41.99% 	{background-position: -4px 0px;}				
+				42% 	{background-position: -40px 0px;}
+				43.99% 	{background-position: -40px 0px;}	
+				44% 	{background-position: -4px 0px;}
+				45.99% 	{background-position: -4px 0px;}	
+				46% 	{background-position: -40px 0px;}
+				47.99% 	{background-position: -40px 0px;}	
+				48% 	{background-position: -4px 0px;}
+				49.99% 	{background-position: -4px 0px;}	
+				50% 	{background-position: -40px 0px;}
+				51.99% 	{background-position: -40px 0px;}	
+				52% 	{background-position: -4px 0px;}
+				53.99% 	{background-position: -4px 0px;}
+				54% 	{background-position: -40px 0px;}
+				55.99% 	{background-position: -40px 0px;}	
+				56% 	{background-position: -4px 0px;}
+				57.99% 	{background-position: -4px 0px;}	
+				58% 	{background-position: -40px 0px;}
+				59.99% 	{background-position: -40px 0px;}	
+				60% 	{background-position: -4px 0px;}
+				61.99% 	{background-position: -4px 0px;}	
+				62% 	{background-position: -40px 0px;}
+				63.99% 	{background-position: -40px 0px;}	
+				64% 	{background-position: -4px 0px;}
+				65.99% 	{background-position: -4px 0px;}
+				66% 	{background-position: -40px 0px;}
+				67.99% 	{background-position: -40px 0px;}
+				68% 	{background-position: -4px 0px;}
+				69.99% 	{background-position: -4px 0px;}
+				70% 	{background-position: -40px 0px;}
+				71.99% 	{background-position: -40px 0px;}
+				72% 	{background-position: -4px 0px;}
+				73.99% 	{background-position: -4px 0px;}
+				74% 	{background-position: -40px 0px;}
+				75.99% 	{background-position: -40px 0px;}
+				76% 	{background-position: -4px 0px;}				
+				77.99% 	{background-position: -4px 0px;}
+				78%  	{background-position: -40px 0px;}
+				79.99%  {background-position: -40px 0px;}
+				80% 	{background-position: -4px 0px;}
+				81.99% 	{background-position: -4px 0px;}
+				82% 	{background-position: -40px 0px;}
+				83.99% 	{background-position: -40px 0px;}
+				84% 	{background-position: -4px 0px;}
+				85.99% 	{background-position: -4px 0px;}	
+				86% 	{background-position: -40px 0px;}
+				87.99% 	{background-position: -40px 0px;}
+				88% 	{background-position: -4px 0px;}
+				89.99% 	{background-position: -4px 0px;}
+				90% 	{background-position: -40px 0px;}
+				91.99% 	{background-position: -40px 0px;}
+				92% 	{background-position: -4px 0px;}
+				93.99% 	{background-position: -4px 0px;}	
+				94% 	{background-position: -40px 0px;}
+				95.99% 	{background-position: -40px 0px;}
+				96% 	{background-position: -4px 0px;}
+				97.99% 	{background-position: -4px 0px;}
+				98% 	{background-position: -40px 0px;}
+				99.99% 	{background-position: -40px 0px;}
+				100% 	{background-position: -40px 0px;}					
+			}	
+
+			/*=========================/ 
+				typewriting animations 
+			/=========================*/ 
+			ul#scoreAdvanceTable {text-align: left;}
+			ul#scoreAdvanceTable li {margin-left: 250px; line-height: 2em;}
+			ul#scoreAdvanceTable li span {display: inline-block; height: 32px; width: 48px; text-align: center;}
+			p.typewrite {display: inline-block; white-space: nowrap; overflow: hidden; margin-left: 1em;}
+			.startTypewrite {width: 0;}
+			ul#scoreAdvanceTable li span#span_score_mystery {width: 88px; width: 48px;}
+			ul#scoreAdvanceTable li span#span_score_30 {width: 32px;}
+			ul#scoreAdvanceTable li span#span_score_20 {width: 44px;}
+			ul#scoreAdvanceTable li span#span_score_10 {width: 48px;}
+			
+		</style>
+		<script type="text/javascript">
+
+function leftClick(e){return window.focus(),e||(e=event),void 0===e.which?1==e.button:1==e.which||0==e.button}function nrc(e){if(0==leftClick(e))return ce(e)}function cp(e){e||(e=event),e.stopPropagation?e.stopPropagation():void 0!==e.cancelBubble&&(e.cancelBubble=!0)}function ce(e){return e||(e=event),void 0!==e.preventDefault?e.preventDefault():void 0!==e.cancelBubble&&(e.returnValue=0,e.cancelBubble=!0),!1}void 0!==document.oncontextmenu?document.oncontextmenu=ce:document.onclick=nrc,void 0!==document.onselectstart&&(document.onselectstart=ce),void 0!==document.ondragstart&&(document.ondragstart=ce),document.addEventListener("gesturestart",function(e){e.preventDefault()});var human,mobile=0;function resizeCanvas(){viewport_size=get_viewport();game_area_width=viewport_size[0],game_area_height=viewport_size[1],screen_zoom=(game_area_height-0)/550,800*screen_zoom>game_area_width&&(screen_zoom=(game_area_width-0)/800),document.getElementById("game").style.transform="scale("+screen_zoom+", "+screen_zoom+")",document.getElementById("game").style.transformOrigin="left top"}function get_viewport(){var e,t;return void 0!==window.innerWidth?(e=window.innerWidth,t=window.innerHeight):void 0!==document.documentElement&&void 0!==document.documentElement.clientWidth&&0!=document.documentElement.clientWidth?(e=document.documentElement.clientWidth,t=document.documentElement.clientHeight):(e=document.getElementsByTagName("body")[0].clientWidth,t=document.getElementsByTagName("body")[0].clientHeight),[e,t]}microSpaceInvaders=function(){var e=function(e,t){return t||(t=document),t.querySelector(e)};!function(){for(var e=0,t=["ms","moz","webkit","o"],i=0;i<t.length&&!window.requestAnimationFrame;++i)window.requestAnimationFrame=window[t[i]+"requestAnimationFrame"],window.cancelAnimationFrame=window[t[i]+"CancelAnimationFrame"]||window[t[i]+"CancelrequestAnimationFrame"];window.requestAnimationFrame||(window.requestAnimationFrame=function(t,i){var n=(new Date).getTime(),A=Math.max(0,16-(n-e)),s=window.setTimeout(function(){t(n+A)},A);return e=n+A,s}),window.cancelAnimationFrame||(window.cancelAnimationFrame=function(e){clearTimeout(e)})}();var t,i,n,A,s,a,r=e("#game"),l="data:image/png;base64,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%3D",h={alien_1:{id:"alien_1",width:32,height:32,tiles:[{x:4,y:4},{x:40,y:4}]},alien_2:{id:"alien_2",width:44,height:32,tiles:[{x:4,y:40},{x:56,y:40}]},alien_3:{id:"alien_3",width:48,height:32,tiles:[{x:4,y:76},{x:60,y:76}]},flyingSaucer:{id:"flyingSaucer",width:48,height:28,tiles:[{x:4,y:128}]},cannon:{id:"cannon",width:52,height:32,tiles:[{x:4,y:160},{x:60,y:160}]},cannonBullet:{id:"cannonBullet",width:4,height:28,tiles:[{x:4,y:200}]},alienBullet:{id:"alienBullet",width:12,height:28,tiles:[{x:12,y:200}]},alienExplosion:{id:"alienExplosion",width:52,height:28,tiles:[{x:32,y:200}]},saucerExplosion:{id:"saucerExplosion",width:52,height:28,tiles:[{x:88,y:200}]},bunkerFull:{id:"bunkerFull",width:24,height:24,tiles:[{x:4,y:232},{x:32,y:232},{x:60,y:232},{x:88,y:232}]},bunkerTopLeft:{id:"bunkerTopLeft",width:24,height:24,tiles:[{x:4,y:260},{x:32,y:260},{x:60,y:260},{x:88,y:260}]},bunkerTopRight:{id:"bunkerTopRight",width:24,height:24,tiles:[{x:4,y:288},{x:32,y:288},{x:60,y:288},{x:88,y:288}]},bunkerBottomLeft:{id:"bunkerBottomLeft",width:24,height:24,tiles:[{x:4,y:316},{x:32,y:316},{x:60,y:316},{x:88,y:316}]},bunkerBottomRight:{id:"bunkerBottomRight",width:24,height:24,tiles:[{x:4,y:344},{x:32,y:344},{x:60,y:344},{x:88,y:344}]}},o=function(e){this.typeOf="sprite",this.sprite=e.sprite,this.tileId=0,this.x=e.x,this.y=e.y},d=function(e){for(var t in this.base=new o(e),this.base)this[t]=this.base[t];this.typeOf="ship",this.points=e.points,this.state="alive",this.collide=function(e){return"alive"==this.state&&e.y>=this.y&&e.y<=this.y+this.sprite.height&&e.x>=this.x&&e.x<=this.x+this.sprite.width},this.touchBorder=function(){return w.alienSpeedX>0?this.x+w.alienSquareWidth+5>=i.width:this.x-(w.alienSquareWidth-this.sprite.width)/2<=0},this.setSprite=function(e){this.sprite=e},this.setState=function(e){this.state=e}},u=function(e){for(var t in this.base=new d(e),this.base)"base"!=t&&(this[t]=this.base[t]);this.typeOf="flyingSaucerShip"},p=function(e){for(var t in this.base=new o(e),this.base)this[t]=this.base[t];this.typeOf="bullet",this.collide=function(e){return this.y+this.sprite.height>=e.y&&this.y<=e.y&&this.x+this.sprite.width>=e.x&&this.x<=e.x+e.sprite.width||"alive"==e.state&&this.y<=e.y+e.sprite.height&&this.y>=e.y&&this.x+this.sprite.width>=e.x&&this.x<=e.x+e.sprite.width}},m=function(e){this.typeOf="bunker",this.x=e.x,this.y=e.y,this.blocks=[new o({sprite:h.bunkerTopLeft,x:this.x,y:this.y}),new o({sprite:h.bunkerFull,x:this.x+h.bunkerFull.width,y:this.y}),new o({sprite:h.bunkerFull,x:this.x+2*h.bunkerFull.width,y:this.y}),new o({sprite:h.bunkerTopRight,x:this.x+3*h.bunkerFull.width,y:this.y}),new o({sprite:h.bunkerFull,x:this.x,y:this.y+h.bunkerFull.height}),new o({sprite:h.bunkerBottomRight,x:this.x+h.bunkerFull.width,y:this.y+h.bunkerFull.height}),new o({sprite:h.bunkerBottomLeft,x:this.x+2*h.bunkerFull.width,y:this.y+h.bunkerFull.height}),new o({sprite:h.bunkerFull,x:this.x+3*h.bunkerFull.width,y:this.y+h.bunkerFull.height}),new o({sprite:h.bunkerFull,x:this.x,y:this.y+2*h.bunkerFull.height}),new o({sprite:h.bunkerFull,x:this.x+3*h.bunkerFull.width,y:this.y+2*h.bunkerFull.height})]},g={stars:null,starsLayer:0,k_star_number:0,init:function(){this.stars=[];for(var e=0;e<this.starsLayer;e++){this.stars.push([]);for(var t=0;t<this.k_star_number;t++)this.stars[e].push([Math.random()*i.width,Math.random()*i.height,Math.random()*(2*e+3),Math.random()/2,2*e+3,2*e+3-2])}},drawStars:function(){for(var e,t,A,s,a,r,l,h=0,o=this.stars.length;h<o;h++)for(var c=0,d=this.stars[h].length;c<d;c++)t=(e=this.stars[h][c])[0],A=e[1],s=e[2],a=e[3],r=e[4],l=e[5],n.fillStyle="rgba(255, 255, 255, "+a+")",n.beginPath(),n.arc(t,A,s,0,2*Math.PI,!0),n.closePath(),n.fill(),t-s<0?(e[0]=i.width-s,e[2]=Math.random()*r,e[1]=Math.random()*i.height,e[3]=Math.random()/2):e[0]-=l}},w={flyingSaucer:null,alienBullet:null,flyingSaucerTimer:null,arrAliens:null,alienBorderCollision:null,alienBulletSpeed:10,nAlienRows:5,nAliensByRow:11,alienSquareWidth:60,alienSquareHeight:40,alienSpeedX:10,alienSpeedY:40,alienInitialY:160,flyingSaucerInitialY:100,flyingSaucerSpeed:4,init:function(){var e,t;this.alienBorderCollision=!0,this.flyingSaucer=null,this.flyingSaucerTimer=(new Date).getTime(),this.alienBullet=null,this.arrAliens=[],this.alienSpeedX=10;for(var i=0;i<this.nAlienRows;i++){0==i&&(e=h.alien_1,t=30),i>0&&i<3&&(e=h.alien_2,t=20),i>2&&i<5&&(e=h.alien_3,t=10);for(var n=0;n<this.nAliensByRow;n++)this.arrAliens.push(new d({sprite:e,x:n*this.alienSquareWidth+(this.alienSquareWidth-e.width)/2,y:i*this.alienSquareHeight+this.alienInitialY,points:t}))}},updateAliens:function(){for(var e,t={x:0,y:0,tile:1},i=this.alienSpeedX,n=0,A=0;A<this.arrAliens.length;A++)if("striked"!=(e=this.arrAliens[A]).state){if(e.touchBorder()&&!this.alienBorderCollision){this.alienBorderCollision=!this.alienBorderCollision,i=0,n=this.alienSpeedY,this.alienSpeedX*=-1;break}e.y+e.sprite.height>=human.cannon.y&&(s=!0)}else this.arrAliens.splice(A,1),A=0;return 0!=i&&(this.alienBorderCollision=!this.alienBorderCollision),t.x=i,t.y=n,t},drawAlienShips:function(e){for(var i,A=0;A<this.arrAliens.length;A++)"striked"==(i=this.arrAliens[A]).state&&i.setSprite(h.alienExplosion),i.x+=e.x,i.y+=e.y,i.tileId+=e.tile,i.tileId>=i.sprite.tiles.length&&(i.tileId=0),n.drawImage(t,i.sprite.tiles[i.tileId].x,i.sprite.tiles[i.tileId].y,i.sprite.width,i.sprite.height,i.x,i.y,i.sprite.width,i.sprite.height)},updateFlyingSaucer:function(){return this.flyingSaucer&&"striked"==this.flyingSaucer.state},drawFlyingSaucer:function(e){var A=(new Date).getTime();this.flyingSaucer?("striked"==this.flyingSaucer.state&&(this.flyingSaucer.sprite=h.saucerExplosion),this.flyingSaucer.x<=-h.flyingSaucer.width||e?(this.flyingSaucer=null,this.flyingSaucerTimer=A):(this.flyingSaucer.x-=this.flyingSaucerSpeed,n.drawImage(t,this.flyingSaucer.sprite.tiles[0].x,this.flyingSaucer.sprite.tiles[0].y,this.flyingSaucer.sprite.width,this.flyingSaucer.sprite.height,this.flyingSaucer.x,this.flyingSaucer.y,this.flyingSaucer.sprite.width,this.flyingSaucer.sprite.height))):A-this.flyingSaucerTimer>=1e4&&(this.flyingSaucer=new u({sprite:h.flyingSaucer,x:i.width,y:this.flyingSaucerInitialY,points:100}))},drawAliens:function(){var e,t={x:0,y:0,tile:0};33==A?(t=this.updateAliens(),e=this.updateFlyingSaucer(),A=0):A++,this.drawAlienShips(t),this.drawFlyingSaucer(e)},drawAlienBullet:function(){if(this.alienBullet){var e=!0;if(this.alienBullet.y+=this.alienBulletSpeed,this.alienBullet.y>=i.height&&(e=!1),e&&this.alienBullet.collide(human.cannon)&&(x.nLives--,0==x.nLives&&human.cannon.tileId++,e=!1),e)for(var A,s,a=0,r=y.arrBunker.length;a<r;a++)for(var l=0,o=(A=y.arrBunker[a]).blocks.length;l<o;l++)if(s=A.blocks[l],this.alienBullet.collide(s)){s.tileId++,s.tileId>=s.sprite.tiles.length&&A.blocks.splice(l,1),e=!1;break}e&&this.alienBullet.y+this.alienBullet.sprite.height>=x.lineY&&x.lineInterrupts.join().indexOf(this.alienBullet.x.toString())<0&&x.lineInterrupts.push(this.alienBullet.x),e?n.drawImage(t,this.alienBullet.sprite.tiles[0].x,this.alienBullet.sprite.tiles[0].y,this.alienBullet.sprite.width,this.alienBullet.sprite.height,this.alienBullet.x,this.alienBullet.y,this.alienBullet.sprite.width,this.alienBullet.sprite.height):this.alienBullet=null}else{var c=Math.floor((this.arrAliens.length+1)*Math.random());this.arrAliens[c]&&(this.alienBullet=new p({sprite:h.alienBullet,x:this.arrAliens[c].x+this.arrAliens[c].sprite.width/2,y:this.arrAliens[c].y}))}}};human={cannon:null,cannonBullet:null,moveCannon:[0,0],cannonFire:null,cannonSpeed:8,cannonBulletSpeed:10,score:0,credit:0,init:function(){this.moveCannon=[0,0],this.cannonFire=!1,this.cannonBullet=null,this.score=0,this.cannon=new d({sprite:h.cannon,x:i.width/2-h.cannon.width/2,y:i.height-55-h.cannon.height})},drawCannon:function(){s||(this.moveCannon[0]&&this.cannon.x>=0&&(this.cannon.x+=-this.cannonSpeed),this.moveCannon[1]&&this.cannon.x<=i.width-this.cannon.sprite.width&&(this.cannon.x+=this.cannonSpeed)),this.cannon.y=i.height-55-h.cannon.height,n.drawImage(t,this.cannon.sprite.tiles[this.cannon.tileId].x,this.cannon.sprite.tiles[this.cannon.tileId].y,this.cannon.sprite.width,this.cannon.sprite.height,this.cannon.x,this.cannon.y,this.cannon.sprite.width,this.cannon.sprite.height)},drawCannonBullet:function(){if(this.cannonBullet){var e=!0;if(this.cannonBullet.y-=this.cannonBulletSpeed,this.cannonBullet.y<=0&&(e=!1),e&&w.alienBullet&&this.cannonBullet.collide(w.alienBullet)&&(w.alienBullet=null,e=!1),e&&w.flyingSaucer&&this.cannonBullet.collide(w.flyingSaucer)&&(w.flyingSaucer.setState("striked"),this.score+=w.flyingSaucer.points,e=!1),e)for(var i,A=0;A<w.arrAliens.length;A++)if(i=w.arrAliens[A],this.cannonBullet.collide(i)){i.setState("striked"),this.score+=i.points,e=!1;break}if(e){A=0;for(var a,r,l=y.arrBunker.length;A<l;A++)for(var o=0,c=(a=y.arrBunker[A]).blocks.length;o<c;o++)if(r=a.blocks[o],this.cannonBullet.collide(r)){r.tileId++,r.tileId>=r.sprite.tiles.length&&a.blocks.splice(o,1),e=!1;break}}e?n.drawImage(t,this.cannonBullet.sprite.tiles[0].x,this.cannonBullet.sprite.tiles[0].y,this.cannonBullet.sprite.width,this.cannonBullet.sprite.height,this.cannonBullet.x,this.cannonBullet.y,this.cannonBullet.sprite.width,this.cannonBullet.sprite.height):this.cannonBullet=null}else this.cannonFire&&(s||(this.cannonBullet=new p({sprite:h.cannonBullet,x:this.cannon.x+this.cannon.sprite.width/2-h.cannonBullet.width/2,y:this.cannon.y})))}};var y={arrBunker:null,nBunkers:4,init:function(){var e,t;this.arrBunker=[];for(var n=0;n<this.nBunkers;n++)e=i.width/(2*this.nBunkers)-4*h.bunkerFull.width/2+n*(i.width/this.nBunkers),t=i.height-180,this.arrBunker.push(new m({x:e,y:t}))},drawBunkers:function(){for(var e,i,A=0,s=this.arrBunker.length;A<s;A++)for(var a=0,r=(e=this.arrBunker[A]).blocks.length;a<r;a++)i=e.blocks[a],n.drawImage(t,i.sprite.tiles[i.tileId].x,i.sprite.tiles[i.tileId].y,i.sprite.width,i.sprite.height,i.x,i.y,i.sprite.width,i.sprite.height)}},x={nLives:3,lineY:0,lineHeight:5,lineInterrupts:[],lineImageData:null,init:function(){this.nLives=3,this.lineInterrupts=[],this.lineImageData=null,this.lineY=i.height-50,new f.textArea({cls:"field livesField",childs:[f.writeText({cls:"text livesText",id:"livesPlayer1",text:this.nLives})],appendTo:r,left:"0px",bottom:"0px"})},sortInterrupts:function(e,t){return e-t},drawLine:function(){n.fillStyle="rgba(0,255,0,255)";var e=0,t=i.width;x.lineInterrupts.sort(this.sortInterrupts);for(var A=0;A<this.lineInterrupts.length;A++)t=this.lineInterrupts[A]-e,n.fillRect(e,this.lineY,t,this.lineHeight),e=this.lineInterrupts[A]+h.alienBullet.width;t=i.width-e,n.fillRect(e,this.lineY,t,this.lineHeight)},drawLives:function(){var e,A;this.drawLine();for(var a=0;a<this.nLives;a++)A=i.height-h.cannon.height-7,e=h.cannon.width+a*(1.5*h.cannon.width),c=new d({sprite:h.cannon,x:i.width/2-h.cannon.width/2,y:i.height-h.cannon.height}),n.drawImage(t,h.cannon.tiles[0].x,h.cannon.tiles[0].y,h.cannon.width,h.cannon.height,e,A,h.cannon.width,h.cannon.height);s||f.updateText("#livesPlayer1",this.nLives)}},f={textArea:function(e){if(this.div=document.createElement("div"),e.id&&(this.div.id=e.id),this.div.className=e.cls,this.childs=e.childs,this.appendTo=e.appendTo,e.width&&(this.div.style.width=e.width+"px"),this.appendTo.appendChild(this.div),this.childs)for(var t=0,n=this.childs.length;t<n;t++)this.div.appendChild(this.childs[t]);return this.set=function(e){var t,n,A,s;if(e.position)switch(e.position){case"centerBottom":t=i.width/2-this.div.offsetWidth/2+"px",s="0px";break;case"centerHV":t=i.width/2-this.div.offsetWidth/2+"px",n=i.height/2-this.div.offsetHeight/2+"px";break;case"centerH":t=i.width/2-this.div.offsetWidth/2+"px"}e.left&&(t=e.left),e.top&&(n=e.top),e.bottom&&(s=e.bottom),e.right&&(A=e.right),this.div.style.left=t,this.div.style.top=n,this.div.style.bottom=s,this.div.style.right=A},this.set(e),this},removeTextArea:function(e){r.removeChild(document.querySelector("#"+e))},writeText:function(e){var t=document.createElement("p");return t.className=e.cls,e.id&&(t.id=e.id),e.text&&t.appendChild(document.createTextNode(e.text)),e.innerhtml&&(t.innerHTML=e.innerhtml),e.onclick&&(t.onclick=e.onclick),e.ontouchstart&&(t.ontouchstart=e.ontouchstart),t},typewrite:function(e){for(var t,i,n=document.querySelectorAll(e),A=0;A<n.length;A++){(t=n[A]).className+=" typewrite ",i=t.textContent.length;var s=document.documentElement.appendChild(document.createElement("style")),a=t.id+"_typing {from {width: 0} to {width: "+i+"em}}";CSSRule.WEBKIT_KEYFRAMES_RULE?s.sheet.insertRule("@-webkit-keyframes "+a,0):CSSRule.MOZ_KEYFRAMES_RULE?s.sheet.insertRule("@-moz-keyframes "+a,0):CSSRule.KEYFRAMES_RULE&&s.sheet.insertRule("@keyframes "+a,0),a="{width: auto;}",s.sheet.insertRule("#"+t.id+".end"+a,0),t.style.animation=t.id+"_typing 2s steps("+i+", end) "+2*A+"s",t.style["-webkit-animation"]=t.id+"_typing 2s steps("+i+", end) "+2*A+"s",t.style.MozAnimation=t.id+"_typing 2s steps("+i+", end) "+2*A+"s",t.style["-ms-animation"]=t.id+"_typing 2s steps("+i+", end) "+2*A+"s",t.className+=" startTypewrite ",t.addEventListener("animationend",this.typewrite_cb,!1),t.addEventListener("webkitAnimationEnd",this.typewrite_cb,!1)}return 2*n.length},typewrite_cb:function(e){e.target.className+=" end "},changeTextColor:function(t,i){var n=e(t);if(!i){i="#";for(var A=0;A<3;A++)i+="0123456789ABCDEF".substr(Math.random()*"0123456789ABCDEF".length,1)}n&&(n.style.color=i)},updateText:function(t,i,n){e(t).innerHTML=null==n?i:f.pad(i,4,"0","L")},removeText:function(t){var i=e(t);i&&i.parentNode.removeChild(i)},pad:function(e,t,i,n){var A="";for(e=e.toString();A.length<t-e.length;)A+=i;switch(n){case"L":e=A+e;break;case"R":e+=A}return e}},v=function(e){switch(e||(e=window.event),e.keyCode){case 37:human.moveCannon[0]="keyup"==e.type?0:1;break;case 39:human.moveCannon[1]="keyup"==e.type?0:1;break;case 32:human.cannonFire="keyup"!=e.type,e.preventDefault()}},B=function(){i=document.createElement("canvas"),n=i.getContext("2d"),i.width=1.25*r.offsetWidth,i.height=1.45*r.offsetHeight,r.appendChild(i)},b=function(){human.credit++,f.updateText("#credit",f.pad(human.credit,2,"0","L"))},k=function(e){e||(e=window.event),e.cancelBubble=!0,e.stopPropagation&&e.stopPropagation(),human.credit>-1&&(human.credit>1&&human.credit--,E.game())},S=function(){T(),mobile&&(r.innerHTML+='<div id="controls"><div id="button_left" ontouchstart="human.moveCannon[0]=1" ontouchend="human.moveCannon[0]=0"></div><div id="button_right" ontouchstart="human.moveCannon[1]=1" ontouchend="human.moveCannon[1]=0"></div><div id="button_fire" ontouchstart="human.cannonFire=1" ontouchend="human.cannonFire=0">FIRE</div></div>'),(t=new Image).onload=function(){B(),resizeCanvas(),A=0,s=!1,g.init(),x.init(),human.init(),w.init(),y.init(),new f.textArea({cls:"field scoreField",childs:[f.writeText({cls:"text scoreText",text:"score <1>"}),f.writeText({cls:"text scoreText",id:"scorePlayer1",text:f.pad(human.score,4,"0","L")})],appendTo:r,left:"0px",top:"0px"});var e=r;!function t(A){n.clearRect(0,0,i.width,i.height),g.drawStars(),human.drawCannon(),w.drawAliens(),y.drawBunkers(),human.drawCannonBullet(),w.drawAlienBullet(),f.updateText("#scorePlayer1",human.score,!0),x.drawLives(),s&&E.gameOver(),0==x.nLives&&(s=!0),a=requestAnimationFrame(t,e)}()},t.src=l},T=function(){for(;r.hasChildNodes();)r.removeChild(r.lastChild)},E={intro:function(){!function(){T(),B(),resizeCanvas(),g.init(),new f.textArea({cls:"field",childs:[f.writeText({id:"insertCoins",cls:"text clickText insertCoins",text:"",onclick:b}),f.writeText({id:"SpaceInvadersText",cls:"text",text:"space invaders"}),f.writeText({id:"play",cls:"text clickText menuText",innerhtml:"click here to play!",ontouchstart:function(){mobile=1},onclick:k})],appendTo:r,width:800,position:"centerH",top:"80px",left:"0px"}),new f.textArea({cls:"field scoreAdvanceTableField",childs:[f.writeText({cls:"text scoreAdvanceText",text:"*score advance table*"}),f.writeText({innerhtml:"<ul id='scoreAdvanceTable'><li><span><span id='span_score_mystery'></span></span><p id='score_mystery' class='text scoreAdvanceText'>= ? mystery</p></li><li><span><span id='span_score_30'></span></span><p id='score_30' class='text scoreAdvanceText'>= 30 points</p></li><li><span><span id='span_score_20'></span></span><p id='score_20' class='text scoreAdvanceText'>= 20 points</p></li><li><span><span id='span_score_10'></span></span><p id='score_10' class='text scoreAdvanceText'>= 10 points</p></li></ul>"})],appendTo:r,width:800,position:"centerH",top:"50%",left:"0px"}),e("#span_score_mystery").style.background="url('"+l+"') -4px -122px no-repeat",e("#span_score_30").style.background="url('"+l+"') -4px -4px no-repeat",e("#span_score_20").style.background="url('"+l+"') -4px -40px no-repeat",e("#span_score_10").style.background="url('"+l+"') -4px -76px no-repeat";var t=f.typewrite("#score_mystery, #score_10, #score_20, #score_30"),A=function(t,i,n){var A=e(t);switch(i){case"transitionend":A.addEventListener("transitionend",n,!1),A.addEventListener("webkitTransitionEnd",n,!1),A.addEventListener("oTransitionEnd",n,!1),A.addEventListener("MSTransitionEnd",n,!1)}},s=(function(){var i=e("#span_container"),n=e("#span_img"),s=e("#span_y"),a=r.offsetWidth/2+w.alienSquareWidth+"px";n.style["background-image"]="url('"+l+"')";var h=function(t){switch(t.target.id){case"span_img":"left"==t.propertyName&&(i.style.left=a);break;case"span_container":null!=e("#span_y.end")&&(n.className="end"),null!=e("#span_img.end")&&(n.style.opacity="0"),i.style.left="0",s.className="end"}};A("#span_img","transitionend",h),A("#span_container","transitionend",h),n.style.left=a,setTimeout(function(){n.className="slide",n.style.left="0"},t)}(),r);!function e(t){n.clearRect(0,0,i.width,i.height),g.drawStars(),a=requestAnimationFrame(e,s)}()}()},instructions:function(){},game:function(){cancelAnimationFrame(a),S()},gameOver:function(){cancelAnimationFrame(a),e("#divGameOver")||new f.textArea({id:"divGameOver",cls:"field menuFieldFrame",childs:[f.writeText({cls:"text menuHeaderText",text:"game over"}),f.writeText({cls:"text clickText menuText",text:"play again",onclick:k}),f.writeText({cls:"text clickText menuText",innerhtml:'<a href=".#" target="_BLANK" style="color:inherit;text-decoration:none;" class="text clickText menuText">Want More?</a>'})],appendTo:r,position:"centerH",left:"220px",top:"100px"})}};window.addEventListener("keydown",v,!0),window.addEventListener("keyup",v,!0),window.addEventListener("resize",resizeCanvas,!0),human.credit=1,E.intro()},document.onreadystatechange=function(){"complete"===document.readyState&&microSpaceInvaders()};
+
+		</script>
+	</head>
+	<body>
+		<div id="game">
+		</div>
+		<script src="/game.js"></script>
+	</body>
+</html>
